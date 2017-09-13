@@ -1,0 +1,413 @@
+% vim: set textwidth=120:
+
+% Example CV based on the 1.5-column-cv template. Main features:
+% * uses the Roboto font family and IcoMoon icon set;
+% * doesn't use colours, different font weights are used instead for styling;
+% * because the CV fits on one page, header and footer is empty, since there isn't much useful info to put there;
+% * includes a photo.
+\documentclass[a4paper,10pt]{article}
+
+
+% package imports
+% ---------------
+
+\usepackage[british]{babel} % for correct language and hyphenation and stuff
+\usepackage{calc}           % for easier length calculations (infix notation)
+\usepackage{enumitem}       % for configuring list environments
+\usepackage{fancyhdr}       % for setting header and footer
+\usepackage{fontspec}       % for fonts
+\usepackage{geometry}       % for setting margins (\newgeometry)
+\usepackage{graphicx}       % for pictures
+\usepackage{microtype}      % for microtypography stuff
+\usepackage{xcolor}         % for colours
+
+
+% margin and column widths
+% ------------------------
+
+% margins
+\newgeometry{left=15mm,right=15mm,top=15mm,bottom=15mm}
+
+% width of the gap between left and right column
+\newlength{\cvcolumngapwidth}
+\setlength{\cvcolumngapwidth}{3.5mm}
+
+% left column width
+\newlength{\cvleftcolumnwidth}
+\setlength{\cvleftcolumnwidth}{44.5mm}
+
+% right column width
+\newlength{\cvrightcolumnwidth}
+\setlength{\cvrightcolumnwidth}{\textwidth-\cvleftcolumnwidth-\cvcolumngapwidth}
+
+% set paragraph indentation to 0, because it screws up the whole layout otherwise
+\setlength{\parindent}{0mm}
+
+
+% style definitions
+% -----------------
+% style categories explanation:
+% * \cvnameXXX is used for the name;
+% * \cvsectionXXX is used for section names (left column, accompanied by a horizontal rule);
+% * \cvtitleXXX is used for job/education titles (right column);
+% * \cvdurationXXX is used for job/education durations (left column);
+% * \cvheadingXXX is used for headings (left column);
+% * \cvmainXXX (and \setmainfont) is used for main text;
+% * \cvruleXXX is used for the horizontal rules denoting sections.
+
+% font families
+\defaultfontfeatures{Ligatures=TeX} % reportedly a good idea, see https://tex.stackexchange.com/a/37251
+
+\newfontfamily{\cvnamefont}[Path=resources/Roboto/]{Roboto-Medium.ttf}
+\newfontfamily{\cvsectionfont}[Path=resources/Roboto/]{Roboto-Medium.ttf}
+\newfontfamily{\cvtitlefont}[Path=resources/Roboto/]{Roboto-Regular.ttf}
+\newfontfamily{\cvdurationfont}[Path=resources/Roboto/]{Roboto-LightItalic.ttf}
+\newfontfamily{\cvheadingfont}[Path=resources/Roboto/]{Roboto-Regular.ttf}
+\setmainfont[Path=resources/Roboto/]{Roboto-Light.ttf}
+
+% colours
+\definecolor{cvnamecolor}{HTML}{000000}
+\definecolor{cvsectioncolor}{HTML}{000000}
+\definecolor{cvtitlecolor}{HTML}{000000}
+\definecolor{cvdurationcolor}{HTML}{000000}
+\definecolor{cvheadingcolor}{HTML}{000000}
+\definecolor{cvmaincolor}{HTML}{000000}
+\definecolor{cvrulecolor}{HTML}{000000}
+
+\color{cvmaincolor}
+
+% styles
+\newcommand{\cvnamestyle}[1]{{\Large\cvnamefont\textcolor{cvnamecolor}{#1}}}
+\newcommand{\cvsectionstyle}[1]{{\normalsize\cvsectionfont\textcolor{cvsectioncolor}{#1}}}
+\newcommand{\cvtitlestyle}[1]{{\large\cvtitlefont\textcolor{cvtitlecolor}{#1}}}
+\newcommand{\cvdurationstyle}[1]{{\small\cvdurationfont\textcolor{cvdurationcolor}{#1}}}
+\newcommand{\cvheadingstyle}[1]{{\normalsize\cvheadingfont\textcolor{cvheadingcolor}{#1}}}
+
+
+% inter-item spacing
+% ------------------
+
+% vertical space after personal info and standard CV items
+\newlength{\cvafteritemskipamount}
+\setlength{\cvafteritemskipamount}{5mm plus 1.25mm minus 1.25mm}
+
+% vertical space after sections
+\newlength{\cvaftersectionskipamount}
+\setlength{\cvaftersectionskipamount}{2mm plus 0.5mm minus 0.5mm}
+
+% extra vertical space to be used when a section starts with an item with a heading (e.g. in the skills section),
+% so that the heading does not follow the section name too closely
+\newlength{\cvbetweensectionandheadingextraskipamount}
+\setlength{\cvbetweensectionandheadingextraskipamount}{1mm plus 0.25mm minus 0.25mm}
+
+
+% intra-item spacing
+% ------------------
+
+% vertical space after name
+\newlength{\cvafternameskipamount}
+\setlength{\cvafternameskipamount}{3mm plus 0.75mm minus 0.75mm}
+
+% vertical space after personal info lines
+\newlength{\cvafterpersonalinfolineskipamount}
+\setlength{\cvafterpersonalinfolineskipamount}{2mm plus 0.5mm minus 0.5mm}
+
+% vertical space after titles
+\newlength{\cvaftertitleskipamount}
+\setlength{\cvaftertitleskipamount}{1mm plus 0.25mm minus 0.25mm}
+
+% value to be used as parskip in right column of CV items and itemsep in lists (same for both, for consistency)
+\newlength{\cvparskip}
+\setlength{\cvparskip}{0.5mm plus 0.125mm minus 0.125mm}
+
+% set global list configuration (use parskip as itemsep, and no separation otherwise)
+\setlist{parsep=0mm,topsep=0mm,partopsep=0mm,itemsep=\cvparskip}
+
+
+% CV commands
+% -----------
+
+% creates a "personal info" CV item with the given left and right column contents, with appropriate vertical space after
+% @param #1 left column content (should be the CV photo)
+% @param #2 right column content (should be the name and personal info)
+\newcommand{\cvpersonalinfo}[2]{
+    % left and right column
+    \begin{minipage}[t]{\cvleftcolumnwidth}
+        \vspace{0mm} % XXX hack to align to top, see https://tex.stackexchange.com/a/11632
+        \raggedleft #1
+    \end{minipage}% XXX necessary comment to avoid unwanted space
+    \hspace{\cvcolumngapwidth}% XXX necessary comment to avoid unwanted space
+    \begin{minipage}[t]{\cvrightcolumnwidth}
+        \vspace{0mm} % XXX hack to align to top, see https://tex.stackexchange.com/a/11632
+        #2
+    \end{minipage}
+
+    % space after
+    \vspace{\cvafteritemskipamount}
+}
+
+% typesets a name, with appropriate vertical space after
+% @param #1 name text
+\newcommand{\cvname}[1]{
+    % name
+    \cvnamestyle{#1}
+
+    % space after
+    \vspace{\cvafternameskipamount}
+}
+
+% typesets a line of personal info beginning with an icon, with appropriate vertical space after
+% @param #1 parameters for the \includegraphics command used to include the icon
+% @param #2 icon filename
+% @param #3 line text
+\newcommand{\cvpersonalinfolinewithicon}[3]{
+    % icon, vertically aligned with text (see https://tex.stackexchange.com/a/129463)
+    \raisebox{.5\fontcharht\font`E-.5\height}{\includegraphics[#1]{#2}}
+    % text
+    #3
+
+    % space after
+    \vspace{\cvafterpersonalinfolineskipamount}
+}
+
+% creates a "section" CV item with the given left column content, a horizontal rule in the right column, and with
+% appropriate vertical space after
+% @param #1 left column content (should be the section name)
+\newcommand{\cvsection}[1]{
+    % left and right column
+    \begin{minipage}[t]{\cvleftcolumnwidth}
+        \raggedleft\cvsectionstyle{#1}
+    \end{minipage}% XXX necessary comment to avoid unwanted space
+    \hspace{\cvcolumngapwidth}% XXX necessary comment to avoid unwanted space
+    \begin{minipage}[t]{\cvrightcolumnwidth}
+        \textcolor{cvrulecolor}{\rule{\cvrightcolumnwidth}{0.3mm}}
+    \end{minipage}
+
+    % space after
+    \vspace{\cvaftersectionskipamount}
+}
+
+% creates a standard, multi-purpose CV item with the given left and right column contents, parskip set to cvparskip
+% in the right column, and with appropriate vertical space after
+% @param #1 left column content
+% @param #2 right column content
+\newcommand{\cvitem}[2]{
+    % left and right column
+    \begin{minipage}[t]{\cvleftcolumnwidth}
+        \raggedleft #1
+    \end{minipage}% XXX necessary comment to avoid unwanted space
+    \hspace{\cvcolumngapwidth}% XXX necessary comment to avoid unwanted space
+    \begin{minipage}[t]{\cvrightcolumnwidth}
+        \setlength{\parskip}{\cvparskip} #2
+    \end{minipage}
+
+    % space after
+    \vspace{\cvafteritemskipamount}
+}
+
+% typesets a title, with appropriate vertical space after
+% @param #1 title text
+\newcommand{\cvtitle}[1]{
+    % title
+    \cvtitlestyle{#1}
+
+    % space after
+    \vspace{\cvaftertitleskipamount}
+    % XXX need to subtract cvparskip here, because it is automatically inserted after the title "paragraph"
+    \vspace{-\cvparskip}
+}
+
+
+% header and footer
+% -----------------
+
+% set empty header and footer
+\pagestyle{empty}
+
+
+
+% preamble end/document start
+% ===========================
+
+\begin{document}
+
+
+% personal info
+% -------------
+
+\cvpersonalinfo{
+    % photo
+    \includegraphics[height=36mm]{resources/photo.png}
+}{
+    % name
+    \cvname{Fake Name}
+
+    % address
+    \cvpersonalinfolinewithicon{height=4mm}{resources/IcoMoon-Free-PDF/072-location.pdf}{
+        42 Fake Street, Fake Town
+    }
+
+    % phone number
+    \cvpersonalinfolinewithicon{height=4mm}{resources/IcoMoon-Free-PDF/067-phone.pdf}{
+        +44 07\,123\,456\,789
+    }
+
+    % email address
+    \cvpersonalinfolinewithicon{height=4mm}{resources/IcoMoon-Free-PDF/070-envelop.pdf}{
+        fake.name@fake.com
+    }
+
+    % LinkedIn account
+    \cvpersonalinfolinewithicon{height=4mm}{resources/IcoMoon-Free-PDF/458-linkedin.pdf}{
+        fake-name-123456789
+    }
+
+    % date of birth
+    Born 14 March 1985
+}
+
+
+% work experience
+% ---------------
+
+\cvsection{WORK EXPERIENCE}
+
+% Fake Company 2
+\cvitem{
+    \cvdurationstyle{October 2013 -- present}
+}{
+    \cvtitle{Fake senior position}
+
+    Fake Company 2, Fake Town
+
+    \begin{itemize}[leftmargin=*]
+        \item fake job description (lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+              incididunt ut labore et dolore magna aliqua)
+        \item fake job details (ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+              ea commodo consequat)
+    \end{itemize}
+}
+
+% Fake Company 1
+\cvitem{
+    \cvdurationstyle{July 2010 -- September 2013}
+}{
+    \cvtitle{Fake junior position}
+
+    Fake Company 1, Fake City
+
+    \begin{itemize}[leftmargin=*]
+        \item fake job description (duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
+              fugiat nulla pariatur)
+        \item fake job details (excepteur sint occaecat cupidatat non proident)
+    \end{itemize}
+}
+
+
+% education
+% ---------
+
+\cvsection{EDUCATION}
+
+% master's
+\cvitem{
+    \cvdurationstyle{2008 -- 2010}
+}{
+    \cvtitle{Master's degree in Advanced Fake Studies}
+
+    Faculty of Fake Studies, Fake University
+
+    \begin{itemize}[leftmargin=*]
+        \item fake degree description (sunt in culpa qui officia deserunt mollit anim id est laborum)
+        \item fake thesis description (lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+              incididunt ut labore et dolore magna aliqua)
+        \item fake details (ut enim ad minim veniam)
+    \end{itemize}
+}
+
+% bachelor's
+\cvitem{
+    \cvdurationstyle{2005 -- 2008}
+}{
+    \cvtitle{Bachelors's degree in Fake Studies}
+
+    Faculty of Fake Studies, Fake University
+
+    \begin{itemize}[leftmargin=*]
+        \item fake degree description (quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+              consequat)
+        \item fake details (duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+              nulla pariatur)
+    \end{itemize}
+}
+
+
+% skills
+% ------
+
+\cvsection{SKILLS}
+
+\vspace{\cvbetweensectionandheadingextraskipamount}
+
+% languages
+\cvitem{
+    \cvheadingstyle{Languages}
+}{
+    Fake language -- fake proficiency description
+    \begin{itemize}
+        \item fake certificate description
+    \end{itemize}
+
+    Another fake language -- fake proficiency description
+}
+
+% fake skills
+\cvitem{
+    \cvheadingstyle{Fake skills}
+}{
+    Fake skill 1
+    \begin{itemize}
+        \item fake skill description (excepteur sint occaecat cupidatat non proident)
+        \item fake skill details (sunt in culpa qui officia deserunt mollit anim id est laborum)
+    \end{itemize}
+
+    Fake skill 2
+
+    Fake skill 3
+}
+
+% completely fake skills
+\cvitem{
+    \cvheadingstyle{Completely fake skills}
+}{
+    Completely fake skill 1
+    \begin{itemize}
+        \item completely fake skill description
+    \end{itemize}
+
+    Completely fake skill 2
+}
+
+
+% additional info
+% ---------------
+
+\cvsection{ADDITIONAL INFORMATION}
+
+\vspace{\cvbetweensectionandheadingextraskipamount}
+
+% driving licence
+\cvitem{
+    \cvheadingstyle{Driving licence}
+}{
+    Fake category
+}
+
+% interests
+\cvitem{
+    \cvheadingstyle{Interests}
+}{
+    Fake interest 1, fake interest 2, fake interest 3
+}
+
+\end{document}

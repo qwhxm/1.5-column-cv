@@ -6,7 +6,9 @@ possibilities.
 
 # Preview
 
-![example 1](example-1/cv-example-1.png "example 1") ![example 2](example-2/cv-example-2.png "example 2")
+[Example 1](example-1/cv-example-1.pdf) ([edit on Overleaf](https://www.overleaf.com/latex/templates/1-dot-5-column-cv/rpcbqtrsgbxm)) | [Example 2](example-2/cv-example-2.pdf)
+:------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------:
+![example-1](example-1/cv-example-1.png)                                                                                              | ![example-2](example-2/cv-example-2.png)
 
 # Customisation
 
@@ -26,11 +28,11 @@ and hints.
 
 # Credits
 
-The provided examples use resources from the following projects:
-* [Roboto font family by Google](https://fonts.google.com/specimen/Roboto?selection.family=Roboto) (example 1)
-* [IcoMoon icon pack by Keyamoon](https://icomoon.io/#icons-icomoon) (example 1)
-* [Tex Gyre Heros font family by GUST e-foundry](https://www.fontsquirrel.com/fonts/tex-gyre-heros) (example 2)
-* icons and colours from the [*europasscv* CTAN package](https://www.ctan.org/tex-archive/macros/latex/contrib/europasscv) (example 2)
+The example CVs use resources from the following projects:
+* [Roboto font family by Google](https://fonts.google.com/specimen/Roboto?selection.family=Roboto) (example 1);
+* [IcoMoon icon pack by Keyamoon](https://icomoon.io/#icons-icomoon) (example 1);
+* [TeX Gyre Heros font family by GUST e-foundry](https://www.fontsquirrel.com/fonts/tex-gyre-heros) (example 2);
+* icons and colours from the [*europasscv* package by Giacomo Mazzamuto](https://www.ctan.org/tex-archive/macros/latex/contrib/europasscv) (example 2).
 
 The layout in general is heavily inspired by the [Europass CV template by
 European Union](http://europass.cedefop.europa.eu/documents/curriculum-vitae)
@@ -39,5 +41,5 @@ European Union](http://europass.cedefop.europa.eu/documents/curriculum-vitae)
 
 # Licence
 
-Resources from the above-mentioned projects are licensed under the terms of
-their respective licences, the rest of the repository under the MIT licence.
+Resources from the projects listed above are licensed under the terms of their
+respective licences, the rest of the repository under the MIT licence.
